@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ include "telegraf.fullname" . }}
+  name: {{ include "telegraf-ds.fullname" . }}
   labels:
-    {{- include "telegraf.labels" . | nindent 4 }}
+    {{- include "telegraf-ds.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "telegraf.name" . }}
+      app.kubernetes.io/name: {{ include "telegraf-ds.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "telegraf.name" . }}
+        app.kubernetes.io/name: {{ include "telegraf-ds.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{- with .Values.podLabels }}
 {{ toYaml . | indent 8 }}
@@ -25,7 +25,7 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
         {{- end }}
     spec:
-      serviceAccountName: {{ template "telegraf.serviceAccountName" . }}
+      serviceAccountName: {{ template "telegraf-ds.serviceAccountName" . }}
 {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
 {{- end }}
@@ -93,7 +93,7 @@ spec:
           path: /var/run/utmp
       - name: config
         configMap:
-          name:  {{ include "telegraf.fullname" . }}
+          name:  {{ include "telegraf-ds.fullname" . }}
       {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 6 }}
       {{- end }}

@@ -55,7 +55,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   - agent section
 */}}
 
-{{- define "global_tags" -}}
+{{- define "telegraf.global_tags" -}}
 {{- if . -}}
 [global_tags]
   {{- range $key, $val := . }}
@@ -64,7 +64,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "agent" -}}
+{{- define "telegraf.agent" -}}
 [agent]
 {{- range $key, $value := . -}}
   {{- $tp := typeOf $value }}
@@ -83,7 +83,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "outputs.v1" -}}
+{{- define "telegraf.outputs.v1" -}}
 {{- range $outputIdx, $configObject := . -}}
     {{- range $output, $config := . -}}
 
@@ -178,7 +178,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "inputs.v1" -}}
+{{- define "telegraf.inputs.v1" -}}
 {{- range $inputIdx, $configObject := . -}}
     {{- range $input, $config := . -}}
 
@@ -288,7 +288,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "processors.v1" -}}
+{{- define "telegraf.processors.v1" -}}
 {{- range $processorIdx, $configObject := . -}}
     {{- range $processor, $config := . -}}
 
@@ -410,7 +410,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "aggregators.v1" -}}
+{{- define "telegraf.aggregators.v1" -}}
 {{- range $aggregatorIdx, $configObject := . -}}
     {{- range $aggregator, $config := . -}}
 
@@ -543,53 +543,53 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Backward compatible version support.
 */}}
 
-{{- define "outputs" -}}
-{{- include "section" (prepend . "outputs") -}}
+{{- define "telegraf.outputs" -}}
+{{- include "telegraf.section" (prepend . "outputs") -}}
 {{- end -}}
 
-{{- define "inputs" -}}
-{{- include "section" (prepend . "inputs") -}}
+{{- define "telegraf.inputs" -}}
+{{- include "telegraf.section" (prepend . "inputs") -}}
 {{- end -}}
 
-{{- define "processors" -}}
-{{- include "section" (prepend . "processors") -}}
+{{- define "telegraf.processors" -}}
+{{- include "telegraf.section" (prepend . "processors") -}}
 {{- end -}}
 
-{{- define "aggregators" -}}
-{{- include "section" (prepend . "aggregators") -}}
+{{- define "telegraf.aggregators" -}}
+{{- include "telegraf.section" (prepend . "aggregators") -}}
 {{- end -}}
 
-{{- define "detect.version" -}}
+{{- define "telegraf.detect.version" -}}
 {{ (default 1 .Values.tplVersion) | int64 }}
 {{- end -}}
 
-{{- define "section" -}}
+{{- define "telegraf.section" -}}
 {{- $name := index . 0 -}}
 {{- $version := index . 1 | int64 -}}
 {{- $suffix := ternary "v2" "v1" (eq 2 $version) -}}
-{{- $templateName := printf "%s.%s" $name $suffix -}}
+{{- $templateName := printf "telegraf.%s.%s" $name $suffix -}}
 {{- with index . 2 -}}
   {{ include $templateName . }}
 {{- end }}
 {{- end -}}
 
-{{- define "processors.v2" -}}
-  {{ include "section.v2" (list "processors" .) }}
+{{- define "telegraf.processors.v2" -}}
+  {{ include "telegraf.section.v2" (list "processors" .) }}
 {{- end -}}
 
-{{- define "aggregators.v2" -}}
-  {{ include "section.v2" (list "aggregators" .) }}
+{{- define "telegraf.aggregators.v2" -}}
+  {{ include "telegraf.section.v2" (list "aggregators" .) }}
 {{- end -}}
 
-{{- define "inputs.v2" -}}
-  {{ include "section.v2" (list "inputs" .) }}
+{{- define "telegraf.inputs.v2" -}}
+  {{ include "telegraf.section.v2" (list "inputs" .) }}
 {{- end -}}
 
-{{- define "outputs.v2" -}}
-  {{ include "section.v2" (list "outputs" .) }}
+{{- define "telegraf.outputs.v2" -}}
+  {{ include "telegraf.section.v2" (list "outputs" .) }}
 {{- end -}}
 
-{{- define "section.v2" -}}
+{{- define "telegraf.section.v2" -}}
 {{- $name := index . 0 -}}
 {{- with index . 1 -}}
 {{- range $itemIdx, $configObject := . -}}
@@ -599,7 +599,7 @@ Backward compatible version support.
     {{- $tp := typeOf $config -}}
     {{- if eq $tp "map[string]interface {}" -}}
       {{- $args := dict "key" $item "value" $config "level" 1 "type" $name -}}
-      {{ include "any.table" $args }}
+      {{ include "telegraf.any.table" $args }}
     {{- end }}
     {{- end }}
     {{ end }}
@@ -611,10 +611,10 @@ Backward compatible version support.
 Renders indented table.
 */}}
 
-{{- define "any.table" -}}
+{{- define "telegraf.any.table" -}}
 {{- $n := (mul .level 2) | add 2 | int }}
 {{- $args := dict "key" .key "value" .value "type" .type -}}
-{{- include "any.table.raw" $args | indent $n }}
+{{- include "telegraf.any.table.raw" $args | indent $n }}
 {{- end }}
 
 {{/*
@@ -622,7 +622,7 @@ Renders a table.
 Renders primitive and arrays of primitive types first, then nested tables and arrays of nested tables.
 */}}
 
-{{- define "any.table.raw" -}}
+{{- define "telegraf.any.table.raw" -}}
 {{- $key := .key }}
 {{- $type := .type }}
 {{- range $k, $v := .value }}
@@ -682,13 +682,13 @@ Renders primitive and arrays of primitive types first, then nested tables and ar
       {{- else }}
   [{{ $type }}.{{ $args.key }}]
       {{- end }}
-      {{- include "any.table" $args -}}
+      {{- include "telegraf.any.table" $args -}}
   {{- else if eq $tps "[]interface {}" }}
     {{- if eq (index $v 0 | typeOf) "map[string]interface {}" }}
       {{- range $b, $xv := $v }}
         {{- $args := dict "key" (printf "%s.%s" $key $k) "value" $xv  "type" $type }}
   [[{{ $type }}.{{ $args.key }}]]
-        {{- include "any.table" $args -}}
+        {{- include "telegraf.any.table" $args -}}
       {{- end }}
     {{- end }}
   {{- end }}

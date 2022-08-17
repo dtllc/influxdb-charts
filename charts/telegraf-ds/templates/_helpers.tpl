@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "telegraf.name" -}}
+{{- define "telegraf-ds.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "telegraf.fullname" -}}
+{{- define "telegraf-ds.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,24 +27,24 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "telegraf.chart" -}}
+{{- define "telegraf-ds.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "telegraf.labels" -}}
-helm.sh/chart: {{ include "telegraf.chart" . }}
+{{- define "telegraf-ds.labels" -}}
+helm.sh/chart: {{ include "telegraf-ds.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{ include "telegraf.selectorLabels" . }}
+{{ include "telegraf-ds.selectorLabels" . }}
 {{- end -}}
 
 {{/*
 Selector labels
 */}}
-{{- define "telegraf.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "telegraf.name" . }}
+{{- define "telegraf-ds.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "telegraf-ds.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
@@ -54,7 +54,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   - agent section
 */}}
 
-{{- define "global_tags" -}}
+{{- define "telegraf-ds.global_tags" -}}
 {{- if . -}}
 [global_tags]
   {{- range $key, $val := . }}
@@ -63,7 +63,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "agent" -}}
+{{- define "telegraf-ds.agent" -}}
 [agent]
 {{- range $key, $value := . -}}
   {{- $tp := typeOf $value }}
@@ -82,7 +82,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "outputs" -}}
+{{- define "telegraf-ds.outputs" -}}
 {{- range $outputIdx, $configObject := . -}}
     {{- range $output, $config := . -}}
 
@@ -177,7 +177,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "processors" -}}
+{{- define "telegraf-ds.processors" -}}
 {{- range $processorIdx, $configObject := . -}}
     {{- range $processor, $config := . -}}
 
@@ -269,7 +269,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end -}}
 
-{{- define "aggregators" -}}
+{{- define "telegraf-ds.aggregators" -}}
 {{- range $aggregatorIdx, $configObject := . -}}
     {{- range $aggregator, $config := . -}}
 
@@ -397,9 +397,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "telegraf.serviceAccountName" -}}
+{{- define "telegraf-ds.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-    {{ default (include "telegraf.fullname" .) .Values.serviceAccount.name }}
+    {{ default (include "telegraf-ds.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
@@ -408,7 +408,7 @@ Create the name of the service account to use
 {{/*
 Activate inputs.internal through flag monitor_self
 */}}
-{{- define "monitor_self" -}}
+{{- define "telegraf-ds.monitor_self" -}}
 {{- if . -}}
 [[inputs.internal]]
 {{- end }}
